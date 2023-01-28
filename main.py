@@ -1,20 +1,24 @@
 from vkbottle.bot import Bot, Message
 from vkbottle import Keyboard, Text, KeyboardButtonColor, OpenLink, EMPTY_KEYBOARD
 
-from config import api, state_dispenser, labeler, ADMIN_CHAT
-
-from handlers import donut_labeler, my_club_labeler, tariffs_labeler, admin_labeler
+from config import api, state_dispenser, labeler, ADMIN_CHAT, scheduler
+from database.database import insert_user, create_tables
+from functions.check_sub import sub_end_schedule
+from handlers import donut_labeler, my_club_labeler, tariffs_labeler, admin_labeler, instructions_labeler
 
 labeler.load(donut_labeler)
 labeler.load(my_club_labeler)
 labeler.load(tariffs_labeler)
 labeler.load(admin_labeler)
+labeler.load(instructions_labeler)
 
 bot = Bot(
     api=api,
     labeler=labeler,
     state_dispenser=state_dispenser,
 )
+
+scheduler.start()
 
 
 @bot.on.message(text="/id")
@@ -31,4 +35,12 @@ async def private_message_handler(message: Message):
 async def no_board(message: Message):
     await message.answer('Netu nax', keyboard=EMPTY_KEYBOARD)
 
+
+@bot.on.private_message()
+async def check_db(message: Message):
+    insert_user(message.peer_id)
+
+
+create_tables()
+sub_end_schedule()
 bot.run_forever()

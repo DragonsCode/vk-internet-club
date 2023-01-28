@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 import requests
 
-from outline_vpn.utils import check_ssl_fingerprint
+from .utils import check_ssl_fingerprint
 
 
 @dataclass

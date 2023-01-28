@@ -2,6 +2,7 @@ from vkbottle.bot import BotLabeler, Message, rules
 from vkbottle import Keyboard, Text, KeyboardButtonColor, OpenLink
 
 from config import api, state_dispenser, ADMIN_CHAT
+from database.database import get_user
 
 
 tariffs_labeler = BotLabeler()
@@ -47,7 +48,8 @@ async def pay_year(message: Message):
 async def pay_month(message: Message):
     await message.answer('Вы оплатили на месяц')
     
-    sub = 0
+    user = get_user(message.peer_id)
+    sub = user.end_date
     if sub:
         keyboard = Keyboard(inline=True)
         keyboard.add(Text('Токен клуба', {'club': 'token'}))

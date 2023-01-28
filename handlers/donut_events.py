@@ -1,8 +1,11 @@
+from datetime import datetime, timedelta
+
 from vkbottle.bot import BotLabeler, Message, rules
 from vkbottle import Keyboard, Text, GroupEventType, GroupTypes
 
 from config import api, state_dispenser, ADMIN_CHAT
-
+from states import ctx, InstructionsData
+from database.database import get_user, update_user, get_server
 
 donut_labeler = BotLabeler()
 donut_labeler.vbml_ignore_case = True
@@ -15,18 +18,37 @@ async def new_donut_sub(event: GroupTypes.DonutSubscriptionCreate):
     amount = event.object.amount # сколько было оплачено в рублях integer
     amount_without_fee = event.object.amount_without_fee # сколько было оплачено без учета комиссии float
 
-    # Отправка сообщнния пользователю
     # peer id и user id у пользователей одинаковый
 
-    keyboard = Keyboard(inline=True)
-    keyboard.add(Text('Подключиться!'))
+    user = get_user(user_id)
+    end_date = datetime.now() + timedelta(days=365)
+    is_new = 1
+    if user.end_date is not None:
+        if user.end_date > datetime.now():
+            is_new = 0
+            end_date = user.end_date + timedelta(days=30)
+    update_user(id, user.server, user.flag, user.url, user.token, user.access, user.refs, user.ref_balance, user.referal, user.balance, user.is_admin, end_date)
 
-    await api.messages.send(
-        peer_id=user_id,
-        message=f'Вы оплатили {amount}rub',
-        keyboard=keyboard,
-        random_id=0
-    )
+    if is_new:
+        ctx.set(user_id, {})
+        await state_dispenser.set(user_id, InstructionsData.SERVER)
+
+        keyboard = Keyboard(inline=True)
+        keyboard.add(Text('Connect'))
+        
+        await api.messages.send(
+            peer_id=int(user_id),
+            message='Received your payment, lets create your club!',
+            keyboard=keyboard,
+            random_id=0
+        )
+    
+    else:
+        await api.messages.send(
+            peer_id=int(id),
+            message='Ваша оплата была принята',
+            random_id=0
+        )
 
     # Отправка сообщения админ чату
     await api.messages.send(
@@ -43,11 +65,34 @@ async def donut_prol(event: GroupTypes.DonutSubscriptionProlonged):
     amount_without_fee = event.object.amount_without_fee
 
 
-    await api.messages.send(
-        peer_id=user_id,
-        message='Вы продлили',
-        random_id=0
-    )
+    user = get_user(user_id)
+    end_date = datetime.now() + timedelta(days=365)
+    is_new = 1
+    if user.end_date is not None:
+        if user.end_date > datetime.now():
+            is_new = 0
+            end_date = user.end_date + timedelta(days=30)
+    update_user(id, user.server, user.flag, user.url, user.token, user.access, user.refs, user.ref_balance, user.referal, user.balance, user.is_admin, end_date)
+
+    if is_new:
+        ctx.set(user_id, {})
+        await state_dispenser.set(user_id, InstructionsData.SERVER)
+
+        keyboard = Keyboard(inline=True)
+        keyboard.add(Text('Connect'))
+        
+        await api.messages.send(
+            peer_id=int(user_id),
+            message='Received your payment, lets create your club!',
+            keyboard=keyboard,
+            random_id=0
+        )
+    else:
+        await api.messages.send(
+            peer_id=user_id,
+            message='Вы продлили',
+            random_id=0
+        )
 
     await api.messages.send(
         peer_id=ADMIN_CHAT,
@@ -63,13 +108,13 @@ async def donut_cancl(event: GroupTypes.DonutSubscriptionCancelled):
 
     await api.messages.send(
         peer_id=user_id,
-        message='Вы отменили подписку',
+        message='Вы отменили подписку Donut',
         random_id=0
     )
 
     await api.messages.send(
         peer_id=ADMIN_CHAT,
-        message=f'[id{user_id}|Пользователь] отменил подписку',
+        message=f'[id{user_id}|Пользователь] отменил подписку Donut',
         random_id=0
     )
 
@@ -81,12 +126,12 @@ async def donut_cancl(event: GroupTypes.DonutSubscriptionExpired):
 
     await api.messages.send(
         peer_id=user_id,
-        message='Ваша подписка истекла',
+        message='Ваша подписка Donut истекла',
         random_id=0
     )
 
     await api.messages.send(
         peer_id=ADMIN_CHAT,
-        message=f'У [id{user_id}|пользователя] истекла подписка',
+        message=f'У [id{user_id}|пользователя] истекла подписка Donut',
         random_id=0
     )
