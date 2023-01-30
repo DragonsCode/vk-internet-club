@@ -22,7 +22,9 @@ async def my_club_handler(message: Message):
         insert_user(message.peer_id)
         user = get_user(message.peer_id)
     sub = user.end_date
-    s = user.end_date > datetime.now()
+    s = None
+    if sub is not None:
+        s = user.end_date > datetime.now()
     if s:
         keyboard = Keyboard(inline=True)
         keyboard.add(Text('📦Токен клуба', {'club': 'token'}))
