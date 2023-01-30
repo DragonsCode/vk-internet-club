@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from config import scheduler, api, ADMIN_CHAT
 from functions.vpn import del_key
@@ -9,7 +9,7 @@ async def sub_end():
     users = get_all_users()
     notify = []
     for user in users:
-        if user.end_date <= datetime.now():
+        if user.end_date <= datetime.now() and user.server is not None:
             notify.append(user.user_id)
 
             if user.server is not None:
@@ -19,7 +19,7 @@ async def sub_end():
 
             update_user(user.user_id, None, None, None, None, None, user.refs, user.ref_balance, user.referal, user.balance, user.is_admin, datetime(1, 1, 1))
 
-            await api.messages.send(peer_id=user.user_id, message='Your subscription has ended', random_id=0)
+            await api.messages.send(peer_id=user.user_id, message='Ваша подписка закончилась', random_id=0)
     
     if notify:
         text = ''
@@ -28,9 +28,9 @@ async def sub_end():
             user = await api.users.get(i)
             text += f'[id{i}|{user[0].first_name} {user[0].last_name}], '
         
-        text += 'subscription of these users have been expired'
+        text += 'потеряли свои подписки ;)'
 
         await api.messages.send(peer_id=ADMIN_CHAT, message=text, random_id=0)
 
 def sub_end_schedule():
-    scheduler.add_job(sub_end, 'interval', minutes=3)
+    scheduler.add_job(sub_end, 'interval', days=1)

@@ -1,9 +1,9 @@
-from datetime import datetime, timedelta
-
 from vkbottle.bot import BotLabeler, Message, rules
-from vkbottle import Keyboard, Text, KeyboardButtonColor, GroupEventType, GroupTypes
+from vkbottle import Keyboard, Text, KeyboardButtonColor, PhotoMessageUploader
 
-from config import api, state_dispenser, ADMIN_CHAT
+from datetime import datetime
+
+from config import api, state_dispenser
 from states import ctx, InstructionsData
 from functions.vpn import new_key, del_key
 from database.database import get_user, update_user, get_server, get_server_by_country, update_server, update_user
@@ -13,18 +13,24 @@ instructions_labeler = BotLabeler()
 instructions_labeler.vbml_ignore_case = True
 instructions_labeler.auto_rules = [rules.PeerRule(from_chat=False)]
 
-links = {'Android': 'google.com', 'IOS': 'apple.com', 'Windows': 'bing.com', 'Mac': 'yandex.com'}
+links = {
+    'Android': '📝Перейдите в Google Play, и установите приложение Outline VPN\n\n👉🏻 Или воспользуйтесь ссылкой: https://vk.cc/cf9sVI',
+    'IOS': '📝Перейдите в App Store, и установите приложение Outline VPN\n\n👉🏻 Или воспользуйтесь ссылкой: https://vk.cc/cf9sSe',
+    'Windows': '📝Перейдите по ссылке и установите полученный exe-файл Outline VPN\n\n👉🏻 https://vk.cc/cf9t1r',
+    'Mac': '📝Перейдите в Mac App Store, и установите приложение Outline VPN\n\n👉🏻 Или воспользуйтесь ссылкой: https://vk.cc/cf9sTt'
+}
 
 
 @instructions_labeler.private_message(state=InstructionsData.SERVER)
 async def instruction_server(message: Message):
-    if message.text == 'Connect':
+    if message.text == 'Подключиться!':
         await state_dispenser.set(message.peer_id, InstructionsData.CONNECT)
 
         keyboard = Keyboard(one_time=True)
         servers = get_server(is_open=True)
         if not servers:
-            await message.answer('No servers available')
+            await message.answer('❌На данный момент нет свободных локаций')
+            return
         
         countries = []
         count = 0
@@ -43,15 +49,19 @@ async def instruction_server(message: Message):
 
                 keyboard.add(Text(txt))
         
+        if not countries:
+            await message.answer('❌На данный момент нет свободных локаций')
+            return
+        
         data['server_count'] = count
         ctx.set(message.peer_id, data)
         
-        await message.answer('Выберите сервер', keyboard=keyboard)
+        await message.answer('❓Выберите сервер, на который желаете перевести ваш клуб интернета', keyboard=keyboard)
     
     else:
         keyboard = Keyboard(inline=True)
-        keyboard.add(Text('Connect'))
-        await message.answer('You have to connect, before using our service', keyboard=keyboard)
+        keyboard.add(Text('Подключиться!'))
+        await message.answer('Вы должны подключиться', keyboard=keyboard)
 
 
 @instructions_labeler.private_message(state=InstructionsData.CONNECT)
@@ -94,13 +104,15 @@ async def instruction_connect(message: Message):
             if i == 'IOS':
                 keyboard.row()
         
-        await message.answer('Now you have to choose your platform', keyboard=keyboard)
+        await message.answer('📝Для начала, нужно скачать наше приложение, выберите вашу платформу:', keyboard=keyboard)
     
     else:
         keyboard = Keyboard(one_time=True)
         servers = get_server(is_open=True)
+
         if not servers:
-            await message.answer('No servers available')
+            await message.answer('❌На данный момент нет свободных локаций')
+            return
         
         countries = []
         count = 0
@@ -118,10 +130,14 @@ async def instruction_connect(message: Message):
 
                 keyboard.add(Text(txt))
         
+        if not countries:
+            await message.answer('❌На данный момент нет свободных локаций')
+            return
+        
         data['server_count'] = count
         ctx.set(message.peer_id, data)
         
-        await message.answer('You have to choose correct server!', keyboard=keyboard)
+        await message.answer('❓Выберите сервер, на который желаете перевести ваш клуб интернета', keyboard=keyboard)
 
 
 @instructions_labeler.private_message(state=InstructionsData.PLATFORM)
@@ -130,9 +146,9 @@ async def instruction_platform(message: Message):
         await state_dispenser.set(message.peer_id, InstructionsData.DOWNLOAD)
 
         keyboard = Keyboard(inline=True)
-        keyboard.add(Text('Downloaded'))
+        keyboard.add(Text('Установлено!'))
 
-        await message.answer(f'Download for {message.text}: {links.get(message.text, 0)}', keyboard=keyboard)
+        await message.answer(f'{links.get(message.text, 0)}', keyboard=keyboard)
     
     else:
         platforms = ['Android', 'IOS', 'Windows', 'Mac']
@@ -143,54 +159,54 @@ async def instruction_platform(message: Message):
             if i == 'IOS':
                 keyboard.row()
         
-        await message.answer('You have to choose platform!', keyboard=keyboard)
+        await message.answer('📝Для начала, нужно скачать наше приложение, выберите вашу платформу:', keyboard=keyboard)
 
 
 @instructions_labeler.private_message(state=InstructionsData.DOWNLOAD)
 async def instructions_token(message: Message):
     data = ctx.get(message.peer_id)
 
-    if message.text == 'Downloaded':
+    if message.text == 'Установлено!':
         token = data['token']
 
 
         await state_dispenser.set(message.peer_id, InstructionsData.READY)
 
-        keyboard = Keyboard(inline=True)
-        keyboard.add(Text('Ready'))
+        photo_upd = PhotoMessageUploader(api)
+        photo = await photo_upd.upload('image.png')
 
-        await message.answer('Вставьте отправленный ниже токен', keyboard=keyboard)
+        keyboard = Keyboard(inline=True)
+        keyboard.add(Text('Готово'))
+
+        await message.answer('Замечательно!\n\nТеперь, откройте Outline VPN, и вставьте токен, который я отправил следующим сообщением, затем, нажмите Готово', keyboard=keyboard, attachment=photo)
         await message.answer(f'{token}')
     else:
         keyboard = Keyboard(inline=True)
-        keyboard.add(Text('Downloaded'))
+        keyboard.add(Text('Установлено!'))
         
-        await message.answer('You have to download and press the button to continue!', keyboard=keyboard)
+        await message.answer(f'{links.get(message.text, 0)}', keyboard=keyboard)
 
 
 @instructions_labeler.private_message(state=InstructionsData.READY)
 async def instruction_ready(message: Message):
-    if message.text == 'Ready':
-        await message.answer('Awesome! Enjoy with your club')
+    if message.text == 'Готово':
+        await message.answer('🎉Поздравляю!\n\n🔒Теперь, вы владелец собственного клуба интернета, самого быстрого и безопасного VPN!!\n\nОставьте отзыв о нас - помогите другим пользователям - в отзывах\n\n💳А еще, вы можете рассказать про наш VPN друзьям, за что получите крутые бонусы, подробнее - в партнерке')
 
         user = get_user(message.peer_id)
         sub = user.end_date
-        s = user.server
+        s = user.end_date > datetime.now()
         if s:
             keyboard = Keyboard(inline=True)
-            keyboard.add(Text('Токен клуба', {'club': 'token'}))
+            keyboard.add(Text('📦Токен клуба', {'club': 'token'}))
             keyboard.row()
-            keyboard.add(Text('Сменить сервер', {'club': 'change'}))
+            keyboard.add(Text('⚙Сменить сервер', {'club': 'change'}))
             keyboard.row()
-            keyboard.add(Text('Инструкция', {'club': 'instruction'}))
+            keyboard.add(Text('📃Инструкция', {'club': 'instruction'}))
 
             server = user.flag + ' ' + user.server if user.server is not None else 'No server'
-            date = sub.strftime('%Y/%m/%d')
+            date = sub.strftime('%Y.%m.%d')
 
-            await message.answer(f"Ваш клуб активен до\n{date}\nСервер клуба - {server}", keyboard=keyboard)
-
-            await state_dispenser.delete(message.peer_id)
-            ctx.set(message.peer_id, {})
+            await message.answer(f"✅Ваш клуб активен до «{date}»\n\n💻Сервер клуба - {server}", keyboard=keyboard)
 
         else:
             keyboard = Keyboard(inline=True)
@@ -199,9 +215,18 @@ async def instruction_ready(message: Message):
             keyboard.add(Text('Месячная подписка'), color=KeyboardButtonColor.PRIMARY)
 
             await message.answer('😔Пока у вас нет собственного клуба интернета\n\n👀Только посмотрите, что вы получите:\n\n👉🏻Доступ к запрещенным сайтам (Canva, Instagram)\n👉🏻Высокую скорость работы\n👉🏻Скрытие вашего местоположения\n👉🏻100% защиту ваших данных\n\n💡Выберите срок оформления:', keyboard=keyboard)
-    
+        
     else:
-        keyboard = Keyboard(inline=True)
-        keyboard.add(Text('Ready'))
+        data = ctx.get(message.peer_id)
+        token = data['token']
 
-        await message.answer('If you are done, press the button to continue', keyboard=keyboard)
+        await state_dispenser.set(message.peer_id, InstructionsData.READY)
+
+        photo_upd = PhotoMessageUploader(api)
+        photo = await photo_upd.upload('image.png')
+
+        keyboard = Keyboard(inline=True)
+        keyboard.add(Text('Готово'))
+
+        await message.answer('Замечательно!\n\nТеперь, откройте Outline VPN, и вставьте токен, который я отправил следующим сообщением, затем, нажмите Готово', keyboard=keyboard, attachment=photo)
+        await message.answer(f'{token}')

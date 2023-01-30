@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
 
-from vkbottle.bot import BotLabeler, Message, rules
+from vkbottle.bot import BotLabeler, rules
 from vkbottle import Keyboard, Text, GroupEventType, GroupTypes
 
 from config import api, state_dispenser, ADMIN_CHAT
 from states import ctx, InstructionsData
-from database.database import get_user, update_user, get_server
+from database.database import get_user, update_user
 
 donut_labeler = BotLabeler()
 donut_labeler.vbml_ignore_case = True
@@ -34,11 +34,11 @@ async def new_donut_sub(event: GroupTypes.DonutSubscriptionCreate):
         await state_dispenser.set(user_id, InstructionsData.SERVER)
 
         keyboard = Keyboard(inline=True)
-        keyboard.add(Text('Connect'))
+        keyboard.add(Text('Подключиться!'))
         
         await api.messages.send(
             peer_id=int(user_id),
-            message='Received your payment, lets create your club!',
+            message='✅Отлично! Получил оплату\n\n📌Вы всего в паре шагов для подключения к нашему Клубу Интернета',
             keyboard=keyboard,
             random_id=0
         )
@@ -79,11 +79,11 @@ async def donut_prol(event: GroupTypes.DonutSubscriptionProlonged):
         await state_dispenser.set(user_id, InstructionsData.SERVER)
 
         keyboard = Keyboard(inline=True)
-        keyboard.add(Text('Connect'))
+        keyboard.add(Text('Подключиться!'))
         
         await api.messages.send(
             peer_id=int(user_id),
-            message='Received your payment, lets create your club!',
+            message='✅Отлично! Получил оплату\n\n📌Вы всего в паре шагов для подключения к нашему Клубу Интернета',
             keyboard=keyboard,
             random_id=0
         )

@@ -1,7 +1,7 @@
 from vkbottle.bot import BotLabeler, Message, rules
 from vkbottle import Keyboard, Text, KeyboardButtonColor, OpenLink
 
-from config import api, state_dispenser, ADMIN_CHAT
+from config import api, ADMIN_CHAT
 from database.database import get_user
 
 
@@ -23,7 +23,7 @@ async def button_year(message: Message):
 @tariffs_labeler.private_message(text='Месячная подписка')
 async def button_month(message: Message):
     keyboard = Keyboard(one_time=True)
-    keyboard.add(OpenLink('https://vk.com/donut/public218399445', 'Оплатить'), color=KeyboardButtonColor.POSITIVE)
+    keyboard.add(OpenLink('https://vk.com/intervpn?source=description&w=donut_payment-211717723', 'Оплатить'), color=KeyboardButtonColor.POSITIVE)
     keyboard.add(Text('Назад', {'cmd': 'club'}), color=KeyboardButtonColor.NEGATIVE)
     
     await message.answer('👀Клуб интернета на один месяц стоит всего 200₽\n\n💡Для оплаты, используйте кнопку. Сразу после этого вы сможете воспользоваться любимым сервисом!', keyboard=keyboard)
@@ -33,20 +33,35 @@ async def button_month(message: Message):
 @tariffs_labeler.private_message(text='Оплатить')
 @tariffs_labeler.private_message(payload={'pay': 'year'})
 async def pay_year(message: Message):
-    await message.answer('Переведите по карте и администраторы выдадут вам подписку как только проверят')
+    keyboard = Keyboard(inline=True)
+    keyboard.add(Text('Я оплатил', {'year': 'yes'}))
 
+    await message.answer('💎 Оплатить подписку на год можно либо переводом на карту, либо через банковскую карту!\n\n1️⃣ Переводом на карту:\nПереведите 2000р на карту, реквизиты которой отправлены следующим сообщением, далее нажмите «Я оплатил».\n\n2️⃣ Через банковскую карту:\n\nПерейдите по ссылке sobe.ru/na/72J2u02642F6 или нажмите по кнопке ниже, чтобы перейти на сайт и оплатить подписку на год.\nПосле оплаты нажмите на кнопку «Я оплатил».', keyboard=keyboard)
+    await message.answer('4048025000318561')
+
+
+# @tariffs_labeler.private_message(text='Я оплатил')
+@tariffs_labeler.private_message(payload={'year': 'yes'})
+async def year_yes(message: Message):
     user = await api.users.get(message.from_id)
+
+    keyboard = Keyboard(inline=True)
+    keyboard.add(Text('Принять', {'user_id': message.peer_id}), color=KeyboardButtonColor.POSITIVE)
+    keyboard.add(Text('Отклонить', {'user_id': message.peer_id}), color=KeyboardButtonColor.NEGATIVE)
 
     await api.messages.send(
         peer_id=ADMIN_CHAT,
-        message=f'[id{message.peer_id}|{user[0].first_name} {user[0].last_name}] оплатит на год\ntype "ok {message.peer_id}" to apply or "not ok {message.peer_id}" to discard',
+        message=f'[id{message.peer_id}|{user[0].first_name} {user[0].last_name}] оплатил на год',
+        keyboard=keyboard,
         random_id=0
     )
+
+    await message.answer('Принято!\nПодождите пока администраторы проверят и одобрят вашу оплату!')
 
 @tariffs_labeler.private_message(text='Оплатить')
 @tariffs_labeler.private_message(payload={'pay': 'month'})
 async def pay_month(message: Message):
-    await message.answer('Вы оплатили на месяц')
+    await message.answer('TEST: Вы оплатили на месяц')
     
     user = get_user(message.peer_id)
     sub = user.end_date
