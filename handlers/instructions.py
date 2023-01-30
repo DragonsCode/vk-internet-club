@@ -195,8 +195,8 @@ async def instruction_ready(message: Message):
         user = get_user(message.peer_id)
         sub = user.end_date
         s = None
-            if sub is not None:
-                s = user.end_date > datetime.now()
+        if sub is not None:
+            s = user.end_date > datetime.now()
         if s:
             keyboard = Keyboard(inline=True)
             keyboard.add(Text('📦Токен клуба', {'club': 'token'}))
