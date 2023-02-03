@@ -35,6 +35,26 @@ async def private_message_handler(message: Message):
 # async def no_board(message: Message):
 #     await message.answer('Netu nax', keyboard=EMPTY_KEYBOARD)
 
+@bot.on.private_message(text="Реферальная система")
+async def ref(message: Message):
+    user_id = message.peer_id
+    await message.answer(f"Приглашайте людей по вашей ссылке и получайте скидки!\nВаша ссылка: vk.me/intervpn?ref={user_id}")
+
+
+@bot.on.private_message()
+async def smth(message: Message):
+    ref = message.ref
+    if ref and ref.isdigit():
+        if int(ref) == message.peer_id:
+            await message.answer('Cheater!')
+            return
+        is_group = await bot.api.groups.is_member(188552039, int(ref))
+        if is_group:
+            await message.answer(f"Вы пришли по ссылке человека: {ref}")
+        else:
+            await message.answer(f'User with id {ref} does not exist in this bot')
+    else:
+        await message.answer("Привет")
 
 @bot.on.private_message()
 async def check_db(message: Message):
