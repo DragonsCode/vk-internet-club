@@ -119,6 +119,7 @@ async def addsub(message: Message, num=None, date=None, link=None):
 
                 if not user:
                     await message.answer(f'[id{id}|Пользователь] не обнаружен в базе данных бота')
+                    return
 
                 if date == 's':
                     update_user(user.user_id, None, None, None, None, None, user.refs, user.ref_balance, user.referal, user.balance, user.is_admin, datetime(1, 1, 1))
