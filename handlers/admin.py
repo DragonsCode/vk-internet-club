@@ -122,13 +122,21 @@ async def addsub(message: Message, num=None, date=None, link=None):
                     return
 
                 if date == 's':
-                    update_user(user.user_id, None, None, None, None, None, user.refs, user.ref_balance, user.referal, user.balance, user.is_admin, datetime(1, 1, 1))
-                    await message.answer(f'[id{id}|Пользователь] лишился подписки')
-                    await api.messages.send(
-                        peer_id=id,
-                        message='Администратор лишил вас подписки!',
-                        random_id=0
-                    )
+                    sub = user.end_date
+                    s = None
+                    if sub is not None:
+                        s = user.end_date > datetime.now()
+                    
+                    if s is None:
+                        update_user(user.user_id, None, None, None, None, None, user.refs, user.ref_balance, user.referal, user.balance, user.is_admin, datetime(1, 1, 1))
+                        await message.answer(f'[id{id}|Пользователь] лишился подписки')
+                        await api.messages.send(
+                            peer_id=id,
+                            message='Администратор лишил вас подписки!',
+                            random_id=0
+                        )
+                    else:
+                        await message.answer(f'[id{id}|Пользователь] и без этого плачет без подписки. Пожалейте его!')
                     return
                 
                 days = num if date == 'd' else num * 7 if date == 'w' else num * 30 if date == 'm' else num * 365 if date == 'y' else num
