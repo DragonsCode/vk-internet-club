@@ -95,7 +95,7 @@ async def addserver(message: Message, name=None, flag=None, token=None, num=None
             await message.answer('Вы не врно указали количество слотов, укажите правильно этот аргумент как число большее 0')
 
 
-@admin_labeler.chat_message(text=['!sub <num> <date> <link>', '!sub'], peer_ids=ADMIN_CHAT)
+@admin_labeler.chat_message(text=['/sub <num> <date> <link>', '/sub'], peer_ids=ADMIN_CHAT)
 async def addsub(message: Message, num=None, date=None, link=None):
     if num is None or date is None or link is None:
         await message.answer('Пожалуйста указывайте аргументы правильно: !sub <количество> <время> <ссылка>\
