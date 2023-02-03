@@ -14,7 +14,7 @@ my_club_labeler.vbml_ignore_case = True
 my_club_labeler.auto_rules = [rules.PeerRule(from_chat=False)]
 
 
-@my_club_labeler.private_message(text="Мой клуб")
+@my_club_labeler.private_message(text=["Мой клуб", "🔮Мой клуб"])
 @my_club_labeler.private_message(payload={'cmd': 'club'})
 async def my_club_handler(message: Message):
     user = get_user(message.peer_id)
