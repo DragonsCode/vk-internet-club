@@ -4,13 +4,14 @@ from vkbottle import Keyboard, Text, KeyboardButtonColor, OpenLink, EMPTY_KEYBOA
 from config import api, state_dispenser, labeler, scheduler
 from database.database import insert_user, create_tables
 from functions.check_sub import sub_end_schedule
-from handlers import donut_labeler, my_club_labeler, tariffs_labeler, admin_labeler, instructions_labeler
+from handlers import donut_labeler, my_club_labeler, tariffs_labeler, admin_labeler, instructions_labeler, ref_labeler
 
 labeler.load(donut_labeler)
 labeler.load(my_club_labeler)
 labeler.load(tariffs_labeler)
 labeler.load(admin_labeler)
 labeler.load(instructions_labeler)
+labeler.load(ref_labeler)
 
 bot = Bot(
     api=api,
@@ -34,7 +35,15 @@ async def private_message_handler(message: Message):
 @bot.on.private_message()
 async def check_db(message: Message):
     insert_user(message.peer_id)
-    await message.answer('Напишите команду "Мой клуб"')
+
+    keyboard = Keyboard()
+    keyboard.add(Text('🔮Мой клуб', {'cmd': 'club'}))
+    keyboard.row()
+    keyboard.add(Text("👨‍💼Партнерка"))
+    keyboard.row()
+    keyboard.add(OpenLink('https://vk.me/homa_nobi', '🆘Помощь'))
+
+    await message.answer('Напишите команду', keyboard=keyboard)
 
 
 create_tables()
