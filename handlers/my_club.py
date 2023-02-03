@@ -1,5 +1,5 @@
 from vkbottle.bot import BotLabeler, Message, rules
-from vkbottle import Keyboard, Text, KeyboardButtonColor, EMPTY_KEYBOARD
+from vkbottle import Keyboard, Text, OpenLink, KeyboardButtonColor, EMPTY_KEYBOARD
 
 from datetime import datetime
 
@@ -32,6 +32,8 @@ async def my_club_handler(message: Message):
         keyboard.add(Text('⚙Сменить сервер', {'club': 'change'}))
         keyboard.row()
         keyboard.add(Text('📃Инструкция', {'club': 'instruction'}))
+        keyboard.row()
+        keyboard.add(OpenLink('https://vk.me/homa_nobi', '🆘Помощь'))
 
         server = user.flag + ' ' + user.server if user.server is not None else 'No server'
         date = sub.strftime('%Y.%m.%d')
@@ -43,6 +45,8 @@ async def my_club_handler(message: Message):
         keyboard.add(Text('Годовая подписка'), color=KeyboardButtonColor.POSITIVE)
         keyboard.row()
         keyboard.add(Text('Месячная подписка'), color=KeyboardButtonColor.PRIMARY)
+        keyboard.row()
+        keyboard.add(OpenLink('https://vk.me/homa_nobi', '🆘Помощь'))
 
         await message.answer('😔Пока у вас нет собственного клуба интернета\n\n👀Только посмотрите, что вы получите:\n\n👉🏻Доступ к запрещенным сайтам (Canva, Instagram)\n👉🏻Высокую скорость работы\n👉🏻Скрытие вашего местоположения\n👉🏻100% защиту ваших данных\n\n💡Выберите срок оформления:', keyboard=keyboard)
 
