@@ -167,7 +167,10 @@ async def instructions_token(message: Message):
     data = ctx.get(message.peer_id)
 
     if message.text == 'Установлено!':
-        token = data['token']
+        token = data.get('token', 0)
+        if not token:
+            user = get_user(message.peer_id)
+            token = user.access
 
 
         await state_dispenser.set(message.peer_id, InstructionsData.READY)
