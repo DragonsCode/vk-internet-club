@@ -31,6 +31,8 @@ async def change(message: Message):
         if i.name not in countries and i.name != user.server:
             countries.append(i.name)
             keyboard.add(Text(f'{i.flag} {i.name} - {i.slots} слотов', {'change': 'server'}))
+            if i != servers[-1]:
+                keyboard.row()
 
     if not countries:
             await message.answer('❌На данный момент нет свободных локаций')
