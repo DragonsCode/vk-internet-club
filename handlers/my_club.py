@@ -14,51 +14,6 @@ my_club_labeler.vbml_ignore_case = True
 my_club_labeler.auto_rules = [rules.PeerRule(from_chat=False)]
 
 
-@my_club_labeler.private_message(text=["Мой клуб", "🔮Мой клуб"])
-@my_club_labeler.private_message(payload={'cmd': 'club'})
-async def my_club_handler(message: Message):
-    user = get_user(message.peer_id)
-    if not user:
-        insert_user(message.peer_id)
-        user = get_user(message.peer_id)
-    sub = user.end_date
-    s = None
-    if sub is not None:
-        s = user.end_date > datetime.now()
-    if s:
-        keyboard = Keyboard(inline=True)
-        keyboard.add(Text('📦Токен клуба', {'club': 'token'}))
-        keyboard.row()
-        keyboard.add(Text('⚙Сменить сервер', {'club': 'change'}))
-        keyboard.row()
-        keyboard.add(Text('📃Инструкция', {'club': 'instruction'}))
-        keyboard.row()
-        keyboard.add(OpenLink('https://vk.me/homa_nobi', '🆘Помощь'))
-
-        server = user.flag + ' ' + user.server if user.server is not None else 'No server'
-        date = sub.strftime('%Y.%m.%d')
-
-        await message.answer(f"✅Ваш клуб активен до «{date}»\n\n💻Сервер клуба - {server}", keyboard=keyboard)
-
-    else:
-        keyboard = Keyboard(inline=True)
-        keyboard.add(Text('Годовая подписка'), color=KeyboardButtonColor.POSITIVE)
-        keyboard.row()
-        keyboard.add(Text('Месячная подписка'), color=KeyboardButtonColor.PRIMARY)
-        keyboard.row()
-        keyboard.add(OpenLink('https://vk.me/homa_nobi', '🆘Помощь'))
-
-        await message.answer('😔Пока у вас нет собственного клуба интернета\n\n👀Только посмотрите, что вы получите:\n\n👉🏻Доступ к запрещенным сайтам (Canva, Instagram)\n👉🏻Высокую скорость работы\n👉🏻Скрытие вашего местоположения\n👉🏻100% защиту ваших данных\n\n💡Выберите срок оформления:', keyboard=keyboard)
-
-
-@my_club_labeler.private_message(text="📦Токен клуба")
-@my_club_labeler.private_message(payload={'club': 'token'})
-async def club_token(message: Message):
-    user = get_user(message.peer_id)
-    token = user.access
-    await message.answer('✅Вставьте отправленный ниже токен в приложение Outline, и подключайтесь к вашему клубу интернета!')
-    await message.answer(f'{token}')
-
 
 @my_club_labeler.private_message(text="⚙Сменить сервер")
 @my_club_labeler.private_message(payload={'club': 'change'})
@@ -82,6 +37,58 @@ async def change(message: Message):
             return
     
     await message.answer('❓Выберите сервер, на который желаете перевести ваш клуб интернета', keyboard=keyboard)
+
+
+@my_club_labeler.private_message(text=["Мой клуб", "🔮Мой клуб"])
+@my_club_labeler.private_message(payload={'cmd': 'club'})
+async def my_club_handler(message: Message):
+    user = get_user(message.peer_id)
+    if not user:
+        insert_user(message.peer_id)
+        user = get_user(message.peer_id)
+    sub = user.end_date
+    s = None
+    if sub is not None:
+        s = user.end_date > datetime.now()
+    if s:
+        server = user.flag + ' ' + user.server if user.server is not None else False
+
+        if not server:
+            await change(message)
+            return
+
+        date = sub.strftime('%Y.%m.%d')
+        
+        keyboard = Keyboard(inline=True)
+        keyboard.add(Text('📦Токен клуба', {'club': 'token'}))
+        keyboard.row()
+        keyboard.add(Text('⚙Сменить сервер', {'club': 'change'}))
+        keyboard.row()
+        keyboard.add(Text('📃Инструкция', {'club': 'instruction'}))
+        keyboard.row()
+        keyboard.add(OpenLink('https://vk.me/homa_nobi', '🆘Помощь'))
+        
+
+        await message.answer(f"✅Ваш клуб активен до «{date}»\n\n💻Сервер клуба - {server}", keyboard=keyboard)
+
+    else:
+        keyboard = Keyboard(inline=True)
+        keyboard.add(Text('Годовая подписка'), color=KeyboardButtonColor.POSITIVE)
+        keyboard.row()
+        keyboard.add(Text('Месячная подписка'), color=KeyboardButtonColor.PRIMARY)
+        keyboard.row()
+        keyboard.add(OpenLink('https://vk.me/homa_nobi', '🆘Помощь'))
+
+        await message.answer('😔Пока у вас нет собственного клуба интернета\n\n👀Только посмотрите, что вы получите:\n\n👉🏻Доступ к запрещенным сайтам (Canva, Instagram)\n👉🏻Высокую скорость работы\n👉🏻Скрытие вашего местоположения\n👉🏻100% защиту ваших данных\n\n💡Выберите срок оформления:', keyboard=keyboard)
+
+
+@my_club_labeler.private_message(text="📦Токен клуба")
+@my_club_labeler.private_message(payload={'club': 'token'})
+async def club_token(message: Message):
+    user = get_user(message.peer_id)
+    token = user.access
+    await message.answer('✅Вставьте отправленный ниже токен в приложение Outline, и подключайтесь к вашему клубу интернета!')
+    await message.answer(f'{token}')
 
 
 @my_club_labeler.private_message(payload={'change': 'server'})
