@@ -48,6 +48,8 @@ async def instruction_server(message: Message):
                 data[f'server_{n}_in'] = txt
 
                 keyboard.add(Text(txt))
+                if i != servers[-1]:
+                    keyboard.row()
         
         if not countries:
             await message.answer('❌На данный момент нет свободных локаций')
