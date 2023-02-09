@@ -127,7 +127,7 @@ async def addsub(message: Message, num=None, date=None, link=None):
                     if sub is not None:
                         s = user.end_date > datetime.now()
                     
-                    if s is None:
+                    if s:
                         update_user(user.user_id, None, None, None, None, None, user.refs, user.ref_balance, user.referal, user.balance, user.is_admin, datetime(1, 1, 1))
                         await message.answer(f'[id{id}|Пользователь] лишился подписки')
                         await api.messages.send(
