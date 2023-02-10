@@ -83,7 +83,8 @@ async def instruction_connect(message: Message):
         country = country[1]
         server = get_server_by_country(country)
         url = server.token
-        key = new_key(url)
+        bot_user = await api.users.get(message.peer_id)
+        key = new_key(url, f'{bot_user[0].first_name} {bot_user[0].last_name}')
         user = get_user(message.peer_id)
         old_server = get_server(user.url)[0]
 
