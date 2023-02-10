@@ -36,6 +36,11 @@ async def instruction_server(message: Message):
         countries = []
         count = 0
         user = get_user(message.peer_id)
+        
+        k = len(servers) - 1
+        if user.server is not None:
+            countries.append(user.server)
+            k -= 1
 
         for n, i in enumerate(servers):
             if i.name not in countries and i.name != user.server:
@@ -49,8 +54,9 @@ async def instruction_server(message: Message):
                 data[f'server_{n}_in'] = txt
 
                 keyboard.add(Text(txt))
-                if i != servers[-1]:
+                if k > 0:
                     keyboard.row()
+                    k -= 1
         
         if not countries:
             await message.answer('❌На данный момент нет свободных локаций')
