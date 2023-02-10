@@ -3,7 +3,7 @@ from vkbottle import Keyboard, Text, OpenLink, KeyboardButtonColor, EMPTY_KEYBOA
 
 from datetime import datetime
 
-from config import state_dispenser
+from config import state_dispenser, api
 from database.database import get_user, get_server_by_country, get_server, insert_user, update_user, update_server
 from functions.vpn import new_key, del_key
 from states import ChangedServerData, InstructionsData, ctx
@@ -119,7 +119,8 @@ async def new_token(message: Message):
         country = data['server']
         server = get_server_by_country(country)
         url = server.token
-        key = new_key(url)
+        bot_user = await api.users.get(message.peer_id)
+        key = new_key(url, f'{bot_user[0].first_name} {bot_user[0].last_name}')
         user = get_user(message.peer_id)
 
         if user.url is not None:
