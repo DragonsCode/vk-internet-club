@@ -121,9 +121,9 @@ async def new_token(message: Message):
         url = server.token
         key = new_key(url)
         user = get_user(message.peer_id)
-        old_server = get_server(user.url)[0]
 
         if user.url is not None:
+            old_server = get_server(user.url)[0]
             del_key(user.url, user.token)
             update_server(user.url, old_server.name, old_server.flag, old_server.slots+1)
         
