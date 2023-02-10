@@ -7,6 +7,7 @@ from config import api, state_dispenser
 from states import ctx, InstructionsData
 from functions.vpn import new_key, del_key
 from database.database import get_user, update_user, get_server, get_server_by_country, update_server, update_user
+from .my_club import change
 
 
 instructions_labeler = BotLabeler()
@@ -212,8 +213,16 @@ async def instruction_ready(message: Message):
             keyboard.row()
             keyboard.add(OpenLink('https://vk.me/homa_nobi', '🆘Помощь'))
 
-            server = user.flag + ' ' + user.server if user.server is not None else 'No server'
+            server = user.flag + ' ' + user.server if user.server is not None else False
+
+            if not server:
+                await change(message)
+                return
+
             date = sub.strftime('%Y.%m.%d')
+
+            await state_dispenser.delete(message.peer_id)
+            ctx.set(message.peer_id, {})
 
             await message.answer(f"✅Ваш клуб активен до «{date}»\n\n💻Сервер клуба - {server}", keyboard=keyboard)
 
