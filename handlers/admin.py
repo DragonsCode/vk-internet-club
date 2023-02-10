@@ -5,7 +5,8 @@ from vkbottle import Keyboard, Text
 
 from config import api, state_dispenser, ADMIN_CHAT
 from states import ctx, InstructionsData
-from database.database import insert_server, get_user, update_user
+from database.database import insert_server, get_user, update_user, insert_user, update_server, get_server
+from functions.vpn import del_key
 
 
 admin_labeler = BotLabeler()
@@ -128,6 +129,12 @@ async def addsub(message: Message, num=None, date=None, link=None):
                         s = user.end_date > datetime.now()
                     
                     if s:
+                        
+                        if user.url is not None:
+                            old_server = get_server(user.url)[0]
+                            del_key(user.url, user.token)
+                            update_server(user.url, old_server.name, old_server.flag, old_server.slots+1)
+                        
                         update_user(user.user_id, None, None, None, None, None, user.refs, user.ref_balance, user.referal, user.balance, user.is_admin, datetime(1, 1, 1))
                         await message.answer(f'[id{id}|Пользователь] лишился подписки')
                         await api.messages.send(
