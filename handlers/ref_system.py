@@ -57,6 +57,7 @@ async def ref_yes(message: Message):
     keyboard = Keyboard(inline=True)
     keyboard = Keyboard(inline=True)
     keyboard.add(Text('✅Вывести', {'user_id': message.peer_id, 'amount': user.ref_balance, 'id': id.id}), color=KeyboardButtonColor.POSITIVE)
+    keyboard.row()
     keyboard.add(Text('❌Отменить', {'user_id': message.peer_id, 'amount': user.ref_balance, 'id': id.id}), color=KeyboardButtonColor.NEGATIVE)
 
     msg = await api.messages.send(peer_ids=ADMIN_CHAT, message=f'💸[id{message.peer_id}|{bot_user[0].first_name} {bot_user[0].last_name}] запросил на вывод {user.ref_balance}₽ по партнёрской программе\n\n☝️Вывести на VK Pay', keyboard=keyboard, random_id=0)

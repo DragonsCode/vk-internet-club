@@ -49,6 +49,7 @@ async def year_yes(message: Message):
 
     keyboard = Keyboard(inline=True)
     keyboard.add(Text('Принять', {'user_id': message.peer_id, 'id': id.id}), color=KeyboardButtonColor.POSITIVE)
+    keyboard.row()
     keyboard.add(Text('Отклонить', {'user_id': message.peer_id, 'id': id.id}), color=KeyboardButtonColor.NEGATIVE)
 
     msg = await api.messages.send(
