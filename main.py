@@ -47,11 +47,13 @@ async def smth(message: Message):
     if ref and ref.isdigit():
         if int(ref) == message.peer_id:
             # if {ref} id is user_id (Cheating)
+            await message.answer('🔺Главное меню. Для работы используйте кнопки ниже', keyboard=keyboard)
             return
         
         user = get_user(message.peer_id)
         if user.referal:
             # if user already has a referer
+            await message.answer('🔺Главное меню. Для работы используйте кнопки ниже', keyboard=keyboard)
             return
         
         is_group = 1 #await bot.api.groups.is_member(188552039, int(ref))
@@ -98,19 +100,6 @@ async def smth(message: Message):
             # if User with id {ref} does not exist in this bot
 
     await message.answer('🔺Главное меню. Для работы используйте кнопки ниже', keyboard=keyboard)
-
-@bot.on.private_message()
-async def check_db(message: Message):
-    insert_user(message.peer_id)
-
-    keyboard = Keyboard()
-    keyboard.add(Text('🔮Мой клуб', {'cmd': 'club'}))
-    keyboard.row()
-    keyboard.add(Text("👨‍💼Партнерка"))
-    keyboard.row()
-    keyboard.add(OpenLink('https://vk.me/homa_nobi', '🆘Помощь'))
-
-    await message.answer('Напишите команду', keyboard=keyboard)
 
 
 create_tables()
