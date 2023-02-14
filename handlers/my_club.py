@@ -26,7 +26,7 @@ async def change(message: Message):
     if not servers:
             await message.answer('❌На данный момент нет свободных локаций')
             return
-        
+
     k = len(servers) - 1
     if user.server is not None:
         countries.append(user.server)
@@ -66,7 +66,7 @@ async def my_club_handler(message: Message):
             return
 
         date = sub.strftime('%Y.%m.%d')
-        
+
         keyboard = Keyboard(inline=True)
         keyboard.add(Text('📦Токен клуба', {'club': 'token'}))
         keyboard.row()
@@ -75,7 +75,6 @@ async def my_club_handler(message: Message):
         keyboard.add(Text('📃Инструкция', {'club': 'instruction'}))
         keyboard.row()
         keyboard.add(OpenLink('https://vk.me/homa_nobi', '🆘Помощь'))
-        
 
         await message.answer(f"✅Ваш клуб активен до «{date}»\n\n💻Сервер клуба - {server}", keyboard=keyboard)
 
@@ -115,7 +114,7 @@ async def change_server(message: Message):
     keyboard = Keyboard()
     keyboard.add(Text('🚀Новый токен'))
 
-    await message.answer(f'✅Вы успешно перевели свой клуб интернета в {flag}.\n\n💡Вы сменили локацию, поэтому изменился токен клуба 💫\nНажмите на кнопку, чтобы вернуть доступ', keyboard=keyboard)
+    await message.answer(f'✅Вы успешно перевели свой клуб интернета в {flag}.\n\n💡Вы сменили локацию, поэтому изменился токен клуба\n💫\nНажмите на кнопку, чтобы вернуть доступ', keyboard=keyboard)
 
 
 @my_club_labeler.private_message(state=ChangedServerData.SERVER)

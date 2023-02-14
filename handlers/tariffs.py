@@ -2,7 +2,7 @@ from vkbottle.bot import BotLabeler, Message, rules
 from vkbottle import Keyboard, Text, KeyboardButtonColor, OpenLink
 
 from config import api, ADMIN_CHAT
-from database.database import get_user
+from database.database import get_user, insert_request, update_request
 
 
 tariffs_labeler = BotLabeler()
@@ -13,16 +13,16 @@ tariffs_labeler.auto_rules = [rules.PeerRule(from_chat=False)]
 
 @tariffs_labeler.private_message(text='Годовая подписка')
 async def button_year(message: Message):
-    keyboard = Keyboard(one_time=True)
+    keyboard = Keyboard(inline=True)
     keyboard.add(Text('Оплатить', {'pay': 'year'}), color=KeyboardButtonColor.POSITIVE)
     keyboard.add(Text('Назад', {'cmd': 'club'}), color=KeyboardButtonColor.NEGATIVE)
     
-    await message.answer('👀Клуб интернета на год стоит 1 500₽\n🔥Скидка более 30%\n\n💡Для оплаты, используйте кнопку. Сразу после этого вы сможете воспользоваться любимым сервисом!', keyboard=keyboard)
+    await message.answer('👀Клуб интернета на год стоит 1 2000₽\n🔥Скидка более 30%\n\n💡Для оплаты, используйте кнопку. Сразу после этого вы сможете воспользоваться любимым сервисом!', keyboard=keyboard)
 
 
 @tariffs_labeler.private_message(text='Месячная подписка')
 async def button_month(message: Message):
-    keyboard = Keyboard(one_time=True)
+    keyboard = Keyboard(inline=True)
     keyboard.add(OpenLink('https://vk.com/intervpn?source=description&w=donut_payment-211717723', 'Оплатить'), color=KeyboardButtonColor.POSITIVE)
     keyboard.add(Text('Назад', {'cmd': 'club'}), color=KeyboardButtonColor.NEGATIVE)
     
@@ -45,16 +45,20 @@ async def pay_year(message: Message):
 async def year_yes(message: Message):
     user = await api.users.get(message.from_id)
 
-    keyboard = Keyboard(inline=True)
-    keyboard.add(Text('Принять', {'user_id': message.peer_id}), color=KeyboardButtonColor.POSITIVE)
-    keyboard.add(Text('Отклонить', {'user_id': message.peer_id}), color=KeyboardButtonColor.NEGATIVE)
+    id = insert_request(0)
 
-    await api.messages.send(
-        peer_id=ADMIN_CHAT,
+    keyboard = Keyboard(inline=True)
+    keyboard.add(Text('Принять', {'user_id': message.peer_id, 'id': id.id}), color=KeyboardButtonColor.POSITIVE)
+    keyboard.add(Text('Отклонить', {'user_id': message.peer_id, 'id': id.id}), color=KeyboardButtonColor.NEGATIVE)
+
+    msg = await api.messages.send(
+        peer_ids=ADMIN_CHAT,
         message=f'[id{message.peer_id}|{user[0].first_name} {user[0].last_name}] оплатил на год',
         keyboard=keyboard,
         random_id=0
     )
+
+    update_request(id.id, msg[0].conversation_message_id)
 
     await message.answer('Принято!\nПодождите пока администраторы проверят и одобрят вашу оплату!')
 

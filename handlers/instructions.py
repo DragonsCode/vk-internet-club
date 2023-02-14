@@ -36,7 +36,7 @@ async def instruction_server(message: Message):
         countries = []
         count = 0
         user = get_user(message.peer_id)
-        
+
         k = len(servers) - 1
         if user.server is not None:
             countries.append(user.server)

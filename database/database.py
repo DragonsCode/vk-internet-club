@@ -24,6 +24,11 @@ class Server:
     token: str
     slots: int
 
+@dataclass
+class Request:
+    id: int
+    msg_id: int
+
 
 
 def create_tables():
@@ -31,7 +36,51 @@ def create_tables():
     cur = con.cursor()
     cur.execute("CREATE TABLE IF NOT EXISTS users(user_id INTEGER, server TEXT DEFAULT NULL, flag TEXT DEFAULT NULL, url TEXT DEFAULT NULL, token INTEGER DEFAULT NULL, access TEXT DEFAULT NULL, refs INT DEFAULT 0, ref_balance INT DEFAULT 0, referal INT DEFAULT 0, balance INT DEFAULT 0, is_admin INT DEFAULT 0, end_date TIMESTAMP DEFAULT NULL)")
     cur.execute("CREATE TABLE IF NOT EXISTS servers(name TEXT, flag TEXT, token TEXT, slots INT)")
+    cur.execute("CREATE TABLE IF NOT EXISTS requests(id INTEGER PRIMARY KEY, msg_id INTEGER)")
     con.commit()
+    cur.close()
+    con.close()
+
+
+def insert_request(msg_id: int):
+    con = sqlite3.connect('bot.db', detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
+    cur = con.cursor()
+    cur.execute("INSERT INTO requests(msg_id) VALUES (?) RETURNING id, msg_id", (msg_id,))
+    row = cur.fetchone()
+    con.commit()
+    cur.close()
+    con.close()
+    return Request(*row)
+
+
+def update_request(id: int, msg_id: int):
+    con = sqlite3.connect('bot.db', detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
+    cur = con.cursor()
+    cur.execute("UPDATE requests SET msg_id = ? WHERE id = ? RETURNING id, msg_id", (msg_id, id,))
+    row = cur.fetchone()
+    print('ROW IS:', row)
+    con.commit()
+    cur.close()
+    con.close()
+    return Request(*row)
+
+
+def get_request(id: int):
+    con = sqlite3.connect('bot.db', detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
+    cur = con.cursor()
+    cur.execute("SELECT * FROM requests WHERE id = ?", (id,))
+    row = cur.fetchone()
+    if not row:
+        return False
+    cur.close()
+    con.close()
+    return Request(*row)
+
+
+def delete_request(id: int):
+    con = sqlite3.connect('bot.db', detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
+    cur = con.cursor()
+    cur.execute("DELETE FROM requests WHERE id = ?", (id,))
     cur.close()
     con.close()
 
@@ -63,6 +112,17 @@ def get_user(user_id: int):
         return False
     return User(*user)
 
+def get_referals(owner_id: int) -> list[User]:
+    con = sqlite3.connect('bot.db', detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
+    cur = con.cursor()
+    check_user = cur.execute("SELECT user_id, server, flag, url, token, access, refs, ref_balance, referal, balance, is_admin, end_date FROM users WHERE referal = ?", (owner_id,))
+    res = check_user.fetchall()
+    cur.close()
+    con.close()
+    users = []
+    for i in res:
+        users.append(User(*i))
+    return users
 
 def get_all_users() -> list[User]:
     con = sqlite3.connect('bot.db', detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
