@@ -143,7 +143,7 @@ async def new_token(message: Message):
         keyboard.add(Text('📃Инструкция', {'club': 'instruction'}))
 
         await message.answer('✅Вставьте отправленный ниже токен в приложение Outline, и подключайтесь к вашему клубу интернета!', keyboard=keyboard)
-        await message.answer(f'{key[1]}')
+        await message.answer(f'{key[1]}', keyboard=EMPTY_KEYBOARD)
 
         await state_dispenser.delete(message.peer_id)
         ctx.set(message.peer_id, {})
