@@ -92,12 +92,9 @@ async def my_club_handler(message: Message):
 @my_club_labeler.private_message(text="📦Токен клуба")
 @my_club_labeler.private_message(payload={'club': 'token'})
 async def club_token(message: Message):
-    keyboard = Keyboard(inline=True)
-    keyboard.add(Text('📃Инструкция', {'club': 'instruction'}))
-
     user = get_user(message.peer_id)
     token = user.access
-    await message.answer('✅Вставьте отправленный ниже токен в приложение Outline, и подключайтесь к вашему клубу интернета!', keyboard=keyboard)
+    await message.answer('✅Вставьте отправленный ниже токен в приложение Outline, и подключайтесь к вашему клубу интернета!')
     await message.answer(f'{token}')
 
 
