@@ -90,13 +90,14 @@ async def instruction_connect(message: Message):
         server = get_server_by_country(country)
         url = server.token
         bot_user = await api.users.get(message.peer_id)
-        key = new_key(url, f'{bot_user[0].first_name} {bot_user[0].last_name}')
         user = get_user(message.peer_id)
-        old_server = get_server(user.url)[0]
 
         if user.url is not None:
+            old_server = get_server(user.url)[0]
             del_key(user.url, user.token)
             update_server(user.url, old_server.name, old_server.flag, old_server.slots+1)
+        
+        key = new_key(url, f'{bot_user[0].first_name} {bot_user[0].last_name}')
         
         update_user(message.peer_id, server.name, server.flag, url, key[0], key[1], user.refs, user.ref_balance, user.referal, user.balance, user.is_admin, user.end_date)
         update_server(url, server.name, server.flag, server.slots-1)

@@ -90,9 +90,11 @@ async def smth(message: Message):
                 referal.is_admin,
                 referal.end_date
             )
+            bot_user = await api.users.get(ref)
+            bot_friend = await api.users.get(message.peer_id)
             await api.messages.send(
                 peer_id=ADMIN_CHAT,
-                message=f'[id{ref}|Пользователь] пригласил [id{message.peer_id}|друга]',
+                message=f'[id{ref}|{bot_user[0].first_name} {bot_user[0].last_name}] пригласил [id{message.peer_id}|{bot_friend[0].first_name} {bot_friend[0].last_name}]',
                 random_id=0
             )
         else:

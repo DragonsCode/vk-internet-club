@@ -12,7 +12,7 @@ donut_labeler.auto_rules = [rules.PeerRule(from_chat=False)]
 
 @donut_labeler.raw_event(GroupEventType.DONUT_SUBSCRIPTION_CREATE, dataclass=GroupTypes.DonutSubscriptionCreate) # хэндлер для новых подписок
 async def new_donut_sub(event: GroupTypes.DonutSubscriptionCreate):
-    user_id = event.object.user_id # айди того кто оформил новую подпискуinteger
+    user_id = event.object.user_id # айди того кто оформил новую подписку integer
     amount = event.object.amount # сколько было оплачено в рублях integer
     amount_without_fee = event.object.amount_without_fee # сколько было оплачено без учета комиссии float
 
@@ -42,7 +42,8 @@ async def new_donut_sub(event: GroupTypes.DonutSubscriptionCreate):
                         ref.is_admin,
                         ref.end_date
                     )
-                    text += f'\nИ его [id{ref.user_id}|реферер] получил 10% от этого платежа ({s}₽)'
+                    bot_user = await api.users.get(ref.user_id)
+                    text += f'\nИ его реферер [id{ref.user_id}|{bot_user[0].first_name} {bot_user[0].last_name}] получил 10% от этого платежа ({s}₽)'
 
 
         await give_sub(user_id, 30, text, 'Ваша оплата была принята')
@@ -80,7 +81,8 @@ async def donut_prol(event: GroupTypes.DonutSubscriptionProlonged):
                         ref.is_admin,
                         ref.end_date
                     )
-                    text += f'\nИ его [id{ref.user_id}|реферер] получил 10% от этого платежа ({s}₽)'
+                    bot_user = await api.users.get(ref.user_id)
+                    text += f'\nИ его реферер [id{ref.user_id}|{bot_user[0].first_name} {bot_user[0].last_name}] получил 10% от этого платежа ({s}₽)'
 
         await give_sub(user_id, 30, text, 'Ваша оплата была принята')
 
@@ -115,8 +117,9 @@ async def donut_cancl(event: GroupTypes.DonutSubscriptionExpired):
         random_id=0
     )
 
+    bot_user = await api.users.get(user_id)
     await api.messages.send(
         peer_id=ADMIN_CHAT,
-        message=f'У [id{user_id}|пользователя] истекла подписка Donut',
+        message=f'У [id{user_id}|{bot_user[0].first_name} {bot_user[0].last_name}] истекла подписка Donut',
         random_id=0
     )

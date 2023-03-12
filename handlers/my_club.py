@@ -92,9 +92,11 @@ async def my_club_handler(message: Message):
 @my_club_labeler.private_message(text="📦Токен клуба")
 @my_club_labeler.private_message(payload={'club': 'token'})
 async def club_token(message: Message):
+    keyboard = Keyboard(inline=True)
+    keyboard.add(Text('📃Инструкция', {'club': 'instruction'}))
     user = get_user(message.peer_id)
     token = user.access
-    await message.answer('✅Вставьте отправленный ниже токен в приложение Outline, и подключайтесь к вашему клубу интернета!')
+    await message.answer('✅Вставьте отправленный ниже токен в приложение Outline, и подключайтесь к вашему клубу интернета!', keyboard=keyboard)
     await message.answer(f'{token}')
 
 
@@ -114,7 +116,7 @@ async def change_server(message: Message):
     keyboard = Keyboard()
     keyboard.add(Text('🚀Новый токен'))
 
-    await message.answer(f'✅Вы успешно перевели свой клуб интернета в {flag}.\n\n💡Вы сменили локацию, поэтому изменился токен клуба\n💫\nНажмите на кнопку, чтобы вернуть доступ', keyboard=keyboard)
+    await message.answer(f'✅Вы успешно перевели свой клуб интернета в {flag}.\n\n💡Вы сменили локацию, поэтому изменился токен клуба\n\n💫Нажмите на кнопку, чтобы вернуть доступ', keyboard=keyboard)
 
 
 @my_club_labeler.private_message(state=ChangedServerData.SERVER)
@@ -125,7 +127,6 @@ async def new_token(message: Message):
         server = get_server_by_country(country)
         url = server.token
         bot_user = await api.users.get(message.peer_id)
-        key = new_key(url, f'{bot_user[0].first_name} {bot_user[0].last_name}')
         user = get_user(message.peer_id)
 
         if user.url is not None:
@@ -133,6 +134,7 @@ async def new_token(message: Message):
             del_key(user.url, user.token)
             update_server(user.url, old_server.name, old_server.flag, old_server.slots+1)
         
+        key = new_key(url, f'{bot_user[0].first_name} {bot_user[0].last_name}')
         update_user(message.peer_id, server.name, server.flag, url, key[0], key[1], user.refs, user.ref_balance, user.referal, user.balance, user.is_admin, user.end_date)
         update_server(url, server.name, server.flag, server.slots-1)
 
