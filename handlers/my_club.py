@@ -94,6 +94,7 @@ async def my_club_handler(message: Message):
 async def club_token(message: Message):
     keyboard = Keyboard(inline=True)
     keyboard.add(Text('📃Инструкция', {'club': 'instruction'}))
+
     user = get_user(message.peer_id)
     token = user.access
     await message.answer('✅Вставьте отправленный ниже токен в приложение Outline, и подключайтесь к вашему клубу интернета!', keyboard=keyboard)
@@ -138,7 +139,10 @@ async def new_token(message: Message):
         update_user(message.peer_id, server.name, server.flag, url, key[0], key[1], user.refs, user.ref_balance, user.referal, user.balance, user.is_admin, user.end_date)
         update_server(url, server.name, server.flag, server.slots-1)
 
-        await message.answer('✅Вставьте отправленный ниже токен в приложение Outline, и подключайтесь к вашему клубу интернета!', keyboard=EMPTY_KEYBOARD)
+        keyboard = Keyboard(inline=True)
+        keyboard.add(Text('📃Инструкция', {'club': 'instruction'}))
+
+        await message.answer('✅Вставьте отправленный ниже токен в приложение Outline, и подключайтесь к вашему клубу интернета!', keyboard=keyboard)
         await message.answer(f'{key[1]}')
 
         await state_dispenser.delete(message.peer_id)
