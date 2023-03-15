@@ -41,7 +41,7 @@ async def smth(message: Message):
     keyboard.row()
     keyboard.add(Text("👨‍💼Партнерка"))
     keyboard.row()
-    keyboard.add(OpenLink('https://vk.me/homa_nobi', '🆘Помощь'))
+    keyboard.add(OpenLink('https://vk.com/club219368377', '🆘Помощь'))
 
     ref = message.ref
     if ref and ref.isdigit():
