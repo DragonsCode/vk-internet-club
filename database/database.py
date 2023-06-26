@@ -94,7 +94,8 @@ def insert_user(user_id: int):
         cur.close()
         con.close()
         return True
-    cur.execute("INSERT INTO users(user_id) VALUES (?)", (user_id,))
+    sub = datetime.datetime(1, 1, 1)
+    cur.execute("INSERT INTO users(user_id, end_date) VALUES (?, ?)", (user_id, sub))
     con.commit()
     cur.close()
     con.close()
