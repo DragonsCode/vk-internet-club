@@ -8,11 +8,13 @@ from database.database import get_all_users, get_server, update_user, update_ser
 async def sub_end():
     users = get_all_users()
     notify = []
+    dons = await api.groups.get_members("-211717723", filter="donut")
+    dons_ids = [i.id for i in dons.items]
     for user in users:
         if user.end_date is None:
             update_user(user.user_id, user.server, user.flag, user.url, user.token, user.access, user.refs, user.ref_balance, user.referal, user.balance, user.is_admin, datetime(1, 1, 1))
         
-        if user.end_date is not None and user.end_date <= datetime.now() and user.server is not None:
+        if user.end_date is not None and user.end_date <= datetime.now() and user.user_id not in dons_ids:
             notify.append(user.user_id)
 
             if user.server is not None:
