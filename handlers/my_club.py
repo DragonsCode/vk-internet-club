@@ -56,16 +56,18 @@ async def my_club_handler(message: Message):
         user = get_user(message.peer_id)
     sub = user.end_date
     s = None
+    dons = await api.groups.get_members("-211717723", filter="donut")
+    dons_ids = [i.id for i in dons.items]
     if sub is not None:
         s = user.end_date > datetime.now()
-    if s:
+    if s or user.user_id in dons_ids:
         server = user.flag + ' ' + user.server if user.server is not None else False
 
         if not server:
             await change(message)
             return
 
-        date = sub.strftime('%Y.%m.%d')
+        date = sub.strftime('%Y.%m.%d') if s else datetime.today().strftime('%Y.%m.%d')
 
         keyboard = Keyboard(inline=True)
         keyboard.add(Text('📦Токен клуба', {'club': 'token'}))
