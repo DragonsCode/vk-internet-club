@@ -57,7 +57,7 @@ async def my_club_handler(message: Message):
     sub = user.end_date
     s = None
     dons = await api.groups.get_members("211717723", filter="donut")
-    dons_ids = [i.id for i in dons.items]
+    dons_ids = [i for i in dons.items]
     if sub is not None:
         s = user.end_date > datetime.now()
     if s or user.user_id in dons_ids:
