@@ -9,7 +9,7 @@ async def sub_end():
     users = get_all_users()
     notify = []
     dons = await api.groups.get_members("211717723", filter="donut")
-    dons_ids = [i.id for i in dons.items]
+    dons_ids = [i for i in dons.items]
     for user in users:
         if user.end_date is None:
             update_user(user.user_id, user.server, user.flag, user.url, user.token, user.access, user.refs, user.ref_balance, user.referal, user.balance, user.is_admin, datetime(1, 1, 1))
