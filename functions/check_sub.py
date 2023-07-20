@@ -8,7 +8,7 @@ from database.database import get_all_users, get_server, update_user, update_ser
 async def sub_end():
     users = get_all_users()
     notify = []
-    dons = await api.groups.get_members("-211717723", filter="donut")
+    dons = await api.groups.get_members("211717723", filter="donut")
     dons_ids = [i.id for i in dons.items]
     for user in users:
         if user.end_date is None:
