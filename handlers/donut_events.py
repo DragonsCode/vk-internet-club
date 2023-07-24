@@ -49,7 +49,7 @@ async def new_donut_sub(event: GroupTypes.DonutSubscriptionCreate):
         await give_sub(user_id, 30, text, 'Ваша оплата была принята')
 
 
-@donut_labeler.raw_event(GroupEventType.DONUT_SUBSCRIPTION_PROLONGED, dataclass=GroupTypes.DonutSubscriptionProlonged)
+@donut_labeler.raw_event(GroupEventType.DONUT_SUBSCRIPTION_PROLONGED, dataclass=dict)
 async def donut_prol(event: GroupTypes.DonutSubscriptionProlonged):
     print("EVENT PROLONGED: ", event)
     print("EVENT PROLONGED OBJECT: ", event.object)
