@@ -52,10 +52,11 @@ async def new_donut_sub(event: GroupTypes.DonutSubscriptionCreate):
 @donut_labeler.raw_event(GroupEventType.DONUT_SUBSCRIPTION_PROLONGED, dataclass=dict)
 async def donut_prol(event: GroupTypes.DonutSubscriptionProlonged):
     print("EVENT PROLONGED: ", event)
-    print("EVENT PROLONGED OBJECT: ", event.object)
-    user_id = event.object.user_id
-    amount = event.object.amount
-    amount_without_fee = event.object.amount_without_fee
+    print("EVENT PROLONGED OBJECT: ", event['object'])
+    object = event['object']
+    user_id = object['user_id']
+    amount = object['amount']
+    amount_without_fee = object['amount_without_fee']
 
     if amount == 200:
         bot_user = await api.users.get(user_id)
