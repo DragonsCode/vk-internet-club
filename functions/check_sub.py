@@ -14,7 +14,7 @@ async def sub_end():
         if user.end_date is None:
             update_user(user.user_id, user.server, user.flag, user.url, user.token, user.access, user.refs, user.ref_balance, user.referal, user.balance, user.is_admin, datetime(1, 1, 1))
         
-        if user.end_date is not None and user.end_date <= datetime.now() and user.user_id not in dons_ids:
+        if user.end_date is not None and (user.end_date <= datetime.now() and user.end_date > datetime(1, 1, 1)) and user.user_id not in dons_ids:
             notify.append(user.user_id)
 
             if user.server is not None:
