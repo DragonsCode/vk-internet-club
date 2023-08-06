@@ -54,7 +54,7 @@ async def donut_prol(event: GroupTypes.DonutSubscriptionProlonged):
     print("EVENT PROLONGED: ", event)
     print("EVENT PROLONGED OBJECT: ", event['object'])
     object = event['object']
-    user_id = object['user_id']
+    user_id = int(object['user_id'])
     amount = object['amount']
     amount_without_fee = object['amount_without_fee']
 
